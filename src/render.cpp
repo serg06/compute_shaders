@@ -127,8 +127,11 @@ namespace {
 	void setup_opengl_storage_blocks(OpenGLInfo* glInfo) {
 		srand(time(NULL));
 
+		// size of buffer we'll need
+		GLuint bufSize = TOTAL_PARTICLES * sizeof(vec4);
+
 		// set initial particle positions
-		vec4 initPos[TOTAL_PARTICLES];
+		vec4* initPos = new vec4[TOTAL_PARTICLES];
 		for (int i = 0; i < TOTAL_PARTICLES; i++) {
 			vec3 particle;
 			float rand_0_1 = (rand() / (float)RAND_MAX); // generate random number 0.0f - 1.0f
@@ -145,25 +148,25 @@ namespace {
 		}
 
 		// set initial velocities
-		vec4 initVel[TOTAL_PARTICLES];
-		memset(initVel, 0, sizeof(initVel));
-
-		// size of buffer we'll need
-		GLuint bufSize = TOTAL_PARTICLES * sizeof(vec4);
+		vec4* initVel = new vec4[TOTAL_PARTICLES];
+		memset(initVel, 0, bufSize);
 
 		// position buffer
 		glCreateBuffers(1, &glInfo->posBuf);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, glInfo->posBufSSBidx, glInfo->posBuf);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
 
-		glNamedBufferSubData(glInfo->posBuf, 0, sizeof(initPos), initPos);
+		glNamedBufferSubData(glInfo->posBuf, 0, bufSize, initPos);
 
 		// velocity buffer
 		glCreateBuffers(1, &glInfo->velBuf);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, glInfo->velBufSSBidx, glInfo->velBuf);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initVel[0], GL_DYNAMIC_DRAW);
 
-		glNamedBufferSubData(glInfo->velBuf, 0, sizeof(initVel), initVel);
+		glNamedBufferSubData(glInfo->velBuf, 0, bufSize, initVel);
+
+		// free
+		delete[] initPos, initVel;
 	}
 
 	void setup_opengl_extra_props(OpenGLInfo* glInfo) {

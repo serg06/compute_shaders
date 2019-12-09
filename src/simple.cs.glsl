@@ -9,7 +9,7 @@ uniform float Gravity2 = 1000.0;
 uniform vec3 BlackHolePos2 = vec3(-DEFAULT_DISTANCE, -DEFAULT_DISTANCE, -1000.0f); 
  
 uniform float ParticleInvMass = 1.0 / 0.1; 
-uniform float DeltaT = 0.0005; 
+uniform float DeltaT = 0.005; 
  
 layout(std430, binding=0) buffer Pos { 
   vec4 Position[]; 

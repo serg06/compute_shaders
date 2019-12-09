@@ -8,7 +8,7 @@
 #include <vmath.h>
 
 #define TRANSFORM_BUFFER_COORDS_OFFSET (2*sizeof(vmath::mat4))
-#define TOTAL_PARTICLES (64*20 * 10)
+#define TOTAL_PARTICLES (64*20 * 100)
 
 // all the GLFW info for our app
 struct GlfwInfo {
