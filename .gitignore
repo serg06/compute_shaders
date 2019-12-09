@@ -1,0 +1,12 @@
+# Project solution is generated into here
+build/
+
+# Project builds into here
+bin/
+
+# Libraries which we compile ourselves
+lib/
+
+# Libpng generated headers
+include/libpng/pnglibconf.h
+
