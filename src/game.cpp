@@ -135,7 +135,7 @@ void App::render(float time) {
 
 	/* COMPUTE */
 	glUseProgram(glInfo.compute_program);
-	glDispatchCompute(TOTAL_PARTICLES / 64 * 20, 1, 1);
+	glDispatchCompute(TOTAL_PARTICLES / 64 * 2, 1, 1);
 
 	/* RENDER */
 	glUseProgram(glInfo.rendering_program);
