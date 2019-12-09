@@ -167,7 +167,7 @@ namespace {
 	}
 
 	void setup_opengl_extra_props(OpenGLInfo* glInfo) {
-		glPointSize(5.0f);
+		glPointSize(1.0f);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);

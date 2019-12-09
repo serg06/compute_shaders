@@ -1,7 +1,7 @@
 #version 450 core
 #define DEFAULT_DISTANCE 250.0
 
-layout( local_size_x = 1000 ) in; 
+layout( local_size_x = 64*20 ) in; 
 
 uniform float Gravity1 = 1000.0; 
 uniform vec3 BlackHolePos1 = vec3(DEFAULT_DISTANCE, DEFAULT_DISTANCE, -1000.0f); 

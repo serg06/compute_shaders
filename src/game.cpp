@@ -135,8 +135,7 @@ void App::render(float time) {
 
 	/* COMPUTE */
 	glUseProgram(glInfo.compute_program);
-	//glDispatchCompute(totalParticles / 1000, 1, 1);
-	glDispatchCompute(1, 1, 1);
+	glDispatchCompute(TOTAL_PARTICLES / 64 * 20, 1, 1);
 
 	/* RENDER */
 	glUseProgram(glInfo.rendering_program);
@@ -146,7 +145,7 @@ void App::render(float time) {
 	glVertexArrayVertexBuffer(glInfo.vao_particle, glInfo.position_bidx, glInfo.posBuf, 0, sizeof(vec4));
 
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-	glDrawArrays(GL_POINTS, 0, 1000);
+	glDrawArrays(GL_POINTS, 0, TOTAL_PARTICLES);
 }
 
 void App::onKey(GLFWwindow* window, int key, int scancode, int action, int mods)
