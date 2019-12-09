@@ -137,7 +137,7 @@ namespace {
 			float rand_0_1 = (rand() / (float)RAND_MAX); // generate random number 0.0f - 1.0f
 			particle[0] = (rand() / (float)RAND_MAX) * 20.0f - 10.0f;
 			particle[1] = (rand() / (float)RAND_MAX) * 20.0f - 10.0f;
-			particle[2] = -1000.0f;
+			particle[2] = PARTICLE_DISTANCE_FROM_VIEWER;
 			//for (int j = 0; j < 3; j++) {
 			//	particle[j] = rand_0_1;
 			//}

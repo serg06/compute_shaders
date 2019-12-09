@@ -114,7 +114,7 @@ void App::render(float time) {
 		(float)windowInfo.vfov, // virtual fov
 		(float)windowInfo.width / (float)windowInfo.height, // aspect ratio
 		0.9f,
-		10000.0f
+		100000.0f
 	);
 
 	/* BACKGROUND / SKYBOX */

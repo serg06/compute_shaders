@@ -9,6 +9,7 @@
 
 #define TRANSFORM_BUFFER_COORDS_OFFSET (2*sizeof(vmath::mat4))
 #define TOTAL_PARTICLES (64*2 * 10000)
+#define PARTICLE_DISTANCE_FROM_VIEWER -10000.0f
 
 // all the GLFW info for our app
 struct GlfwInfo {
