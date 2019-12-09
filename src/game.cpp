@@ -114,7 +114,7 @@ void App::render(float time) {
 		(float)windowInfo.vfov, // virtual fov
 		(float)windowInfo.width / (float)windowInfo.height, // aspect ratio
 		0.9f,
-		1000.0f
+		10000.0f
 	);
 
 	/* BACKGROUND / SKYBOX */
@@ -122,7 +122,7 @@ void App::render(float time) {
 	// Draw background color
 	const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	const GLfloat sky_blue[] = { 135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f };
-	glClearBufferfv(GL_COLOR, 0, sky_blue);
+	glClearBufferfv(GL_COLOR, 0, black);
 	glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0); // used for depth test somehow
 
 	// Update transformation buffer with matrices
@@ -136,7 +136,7 @@ void App::render(float time) {
 	/* COMPUTE */
 	glUseProgram(glInfo.compute_program);
 	//glDispatchCompute(totalParticles / 1000, 1, 1);
-	//glDispatchCompute(1, 1, 1);
+	glDispatchCompute(1, 1, 1);
 
 	/* RENDER */
 	glUseProgram(glInfo.rendering_program);

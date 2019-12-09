@@ -1,11 +1,12 @@
 #version 450 core
+#define DEFAULT_DISTANCE 250.0
 
 layout( local_size_x = 1000 ) in; 
- 
+
 uniform float Gravity1 = 1000.0; 
-uniform vec3 BlackHolePos1; 
+uniform vec3 BlackHolePos1 = vec3(DEFAULT_DISTANCE, DEFAULT_DISTANCE, -1000.0f); 
 uniform float Gravity2 = 1000.0; 
-uniform vec3 BlackHolePos2; 
+uniform vec3 BlackHolePos2 = vec3(-DEFAULT_DISTANCE, -DEFAULT_DISTANCE, -1000.0f); 
  
 uniform float ParticleInvMass = 1.0 / 0.1; 
 uniform float DeltaT = 0.0005; 

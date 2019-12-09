@@ -130,9 +130,16 @@ namespace {
 		// set initial particle positions
 		vec4 initPos[TOTAL_PARTICLES];
 		for (int i = 0; i < TOTAL_PARTICLES; i++) {
+			vec3 particle;
+			float rand_0_1 = (rand() / (float)RAND_MAX); // generate random number 0.0f - 1.0f
+			particle[0] = (rand() / (float)RAND_MAX) * 20.0f - 10.0f;
+			particle[1] = (rand() / (float)RAND_MAX) * 20.0f - 10.0f;
+			particle[2] = -1000.0f;
+			//for (int j = 0; j < 3; j++) {
+			//	particle[j] = rand_0_1;
+			//}
 			for (int j = 0; j < 3; j++) {
-				float rand_0_1 = (rand() / (float)RAND_MAX); // generate random number 0.0f - 1.0f
-				initPos[i][j] = (rand_0_1 * 20.0f) - 10.0f; // set it to -10.0f to 10.0f
+				initPos[i][j] = particle[j];
 			}
 			initPos[i][3] = 1.0f;
 		}
@@ -160,7 +167,7 @@ namespace {
 	}
 
 	void setup_opengl_extra_props(OpenGLInfo* glInfo) {
-		glPointSize(10.0f);
+		glPointSize(5.0f);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);
