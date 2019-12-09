@@ -1,3 +1,5 @@
+#version 450 core
+
 layout( local_size_x = 1000 ) in; 
  
 uniform float Gravity1 = 1000.0; 

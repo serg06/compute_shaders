@@ -62,7 +62,7 @@ void setup_glfw(GlfwInfo* windowInfo, GLFWwindow** window) {
 }
 
 namespace {
-	void setup_opengl_program(OpenGLInfo* glInfo) {
+	void setup_render_program(OpenGLInfo* glInfo) {
 		// list of shaders to create program with
 		// TODO: Embed these into binary somehow - maybe generate header file with cmake.
 		std::vector <std::tuple<std::string, GLenum>> shader_fnames = {
@@ -76,8 +76,19 @@ namespace {
 		// create program
 		glInfo->rendering_program = compile_shaders(shader_fnames);
 
-		// use our program object for rendering
-		glUseProgram(glInfo->rendering_program);
+		//// use our program object for rendering
+		//glUseProgram(glInfo->rendering_program);
+	}
+
+	void setup_compute_program(OpenGLInfo* glInfo) {
+		// list of shaders to create program with
+		// TODO: Embed these into binary somehow - maybe generate header file with cmake.
+		std::vector <std::tuple<std::string, GLenum>> shader_fnames = {
+			{ "../src/simple.cs.glsl", GL_COMPUTE_SHADER },
+		};
+
+		// create program
+		glInfo->compute_program = compile_shaders(shader_fnames);
 	}
 
 	void setup_opengl_vao_particle(OpenGLInfo* glInfo) {
@@ -162,7 +173,8 @@ namespace {
 
 void setup_opengl(OpenGLInfo* glInfo) {
 	// setup shaders
-	setup_opengl_program(glInfo);
+	setup_render_program(glInfo);
+	setup_compute_program(glInfo);
 
 	// setup VAOs
 	setup_opengl_storage_blocks(glInfo);

@@ -26,6 +26,7 @@ struct GlfwInfo {
 struct OpenGLInfo {
 	// program
 	GLuint rendering_program;
+	GLuint compute_program; // compute updated particle positions
 
 	// VAOs
 	GLuint vao_particle;

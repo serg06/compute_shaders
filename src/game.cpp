@@ -133,18 +133,20 @@ void App::render(float time) {
 	sprintf(buf, "Drawing (took %d ms) (render distance = %d)\n", (int)(dt * 1000), min_render_distance);
 	OutputDebugString(buf);
 
-	// RENDER
+	/* COMPUTE */
+	glUseProgram(glInfo.compute_program);
+	//glDispatchCompute(totalParticles / 1000, 1, 1);
+	//glDispatchCompute(1, 1, 1);
+
+	/* RENDER */
+	glUseProgram(glInfo.rendering_program);
 	glBindVertexArray(glInfo.vao_particle);
 
 	// vao: attach position buffer
 	glVertexArrayVertexBuffer(glInfo.vao_particle, glInfo.position_bidx, glInfo.posBuf, 0, sizeof(vec4));
 
-	//glDispatchCompute(totalParticles / 1000, 1, 1);
-	//glDispatchCompute(1, 1, 1);
-	//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	glDrawArrays(GL_POINTS, 0, 1000);
-	//// TODO: Draw box around the square we're looking at.
-	//world->render_outline_of_forwards_block(char_position, direction);
 }
 
 void App::onKey(GLFWwindow* window, int key, int scancode, int action, int mods)
