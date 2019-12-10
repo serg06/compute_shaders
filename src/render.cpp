@@ -154,14 +154,12 @@ namespace {
 		// position buffer
 		glCreateBuffers(1, &glInfo->posBuf);
 		glNamedBufferData(glInfo->posBuf, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
-		glNamedBufferSubData(glInfo->posBuf, 0, bufSize, initPos);
 
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, glInfo->posBufSSBidx, glInfo->posBuf);
 
 		// velocity buffer
 		glCreateBuffers(1, &glInfo->velBuf);
 		glNamedBufferData(glInfo->velBuf, bufSize, &initVel[0], GL_DYNAMIC_DRAW);
-		glNamedBufferSubData(glInfo->velBuf, 0, bufSize, initVel);
 
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, glInfo->velBufSSBidx, glInfo->velBuf);
 
