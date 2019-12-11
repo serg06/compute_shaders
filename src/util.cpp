@@ -51,15 +51,6 @@ namespace {
 #define CHUNK_SIZE (CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT)
 
 layout (location = 0) in vec4 position;
-layout (location = 1) in uint block_type; // fed in via instance array!
-
-// Quad input
-layout (location = 2) in uint q_block_type;
-layout (location = 3) in ivec3 q_corner1;
-layout (location = 4) in ivec3 q_corner2;
-
-out vec4 vs_color;
-out uint vs_block_type;
 
 layout (std140, binding = 0) uniform UNI_IN
 {
@@ -81,124 +72,16 @@ float rand(float seed) {
 
 void main(void)
 {
-	/* GENERATE CORNER BASED ON VERTEX ID & OUR 2 OPPOSITE CORNERS */
-
-	vec4 offset_in_chunk = vec4(q_corner1, 0);
-	ivec3 diffs = q_corner2 - q_corner1;
-
-	// figure out which index stays the same and which indices change
-	int zero_idx = diffs[0] == 0 ? 0 : diffs[1] == 0 ? 1 : 2;
-	int working_idx_1 = zero_idx == 0 ? 1 : 0;
-	int working_idx_2 = zero_idx == 2 ? 1 : 2;
-
-	// generate corner based on vertex ID
-	switch(gl_VertexID) {
-	case 0:
-		// top-left corner
-		break;
-	case 1:
-	case 4:
-		// bottom-left corner
-		offset_in_chunk[working_idx_1] += diffs[working_idx_1];
-		break;
-	case 2:
-	case 3:
-		// top-right corner
-		offset_in_chunk[working_idx_2] += diffs[working_idx_2];
-		break;
-	case 5:
-		// bottom-right corner
-		offset_in_chunk = vec4(q_corner2, 0);
-		break;
-	}
-
-	/* CREATE OUR OFFSET VARIABLE */
-
-	vec4 chunk_base = vec4(uni.base_coords.x * 16, uni.base_coords.y, uni.base_coords.z * 16, 0);
-	vec4 instance_offset = chunk_base + offset_in_chunk;
-
-	/* ADD IT TO VERTEX */
-
-	gl_Position = uni.proj_matrix * uni.mv_matrix * (position + instance_offset);
-
-	// set color
-	int seed = int(instance_offset[0]) ^ int(instance_offset[1]) ^ int(instance_offset[2]);
-	switch(q_block_type) {
-		case 0: // air (just has a color for debugging purposes)
-			vs_color = vec4(0.8 + rand(seed)*0.2, 0.0, 0.0, 1.0); // bright red
-			break;
-		case 1: // grass
-			vs_color = vec4(0.2, 0.8 + rand(seed) * 0.2, 0.0, 1.0); // green
-			// vs_color = vec4(0.2, 0.6, 0.0, 1.0); // green
-			break;
-		case 2: // stone
-			vs_color = vec4(0.4, 0.4, 0.4, 1.0) + vec4(rand(seed), rand(seed), rand(seed), rand(seed))*0.2; // grey
-			// vs_color = vec4(0.4, 0.4, 0.4, 1.0); // grey
-			break;
-		default:
-			vs_color = vec4(1.0, 0.0, 1.0, 1.0); // SUPER NOTICEABLE (for debugging)
-			break;
-	}
-
-    vs_block_type = q_block_type;
-}
-
-// shader starts executing here
-void main_cubes(void)
-{
-	vs_block_type = block_type;
-
-	// TODO: Add chunk offset
-
-	// Given gl_InstanceID, calculate 3D coordinate relative to chunk origin
-	int remainder = gl_InstanceID;
-	int y = remainder / CHUNK_HEIGHT;
-	remainder -= y * CHUNK_WIDTH * CHUNK_DEPTH; // TODO: I think this should be y * CHUNK_HEIGHT
-	int z = remainder / CHUNK_DEPTH;
-	remainder -= z * CHUNK_WIDTH; // TODO: I think this should be z * CHUNK_DEPTH
-	int x = remainder;
-
-	/* CREATE OUR OFFSET VARIABLE */
-
-	vec4 chunk_base = vec4(uni.base_coords.x * 16, uni.base_coords.y, uni.base_coords.z * 16, 0);
-	vec4 offset_in_chunk = vec4(x, y, z, 0);
-	vec4 instance_offset = chunk_base + offset_in_chunk;
-
-	/* ADD IT TO VERTEX */
-
-	gl_Position = uni.proj_matrix * uni.mv_matrix * (position + instance_offset);
-	vs_color = position * 2.0 + vec4(0.5, 0.5, 0.5, 1.0);
-
-	int seed = gl_VertexID * gl_InstanceID;
-	switch(block_type) {
-		case 0: // air (just has a color for debugging purposes)
-			vs_color = vec4(0.7, 0.7, 0.7, 1.0);
-			break;
-		case 1: // grass
-			vs_color = vec4(0.2, 0.8 + rand(seed) * 0.2, 0.0, 1.0); // green
-			break;
-		case 2: // stone
-			vs_color = vec4(0.4, 0.4, 0.4, 1.0) + vec4(rand(seed), rand(seed), rand(seed), rand(seed))*0.2; // grey
-			break;
-		default:
-			vs_color = vec4(1.0, 0.0, 1.0, 1.0); // SUPER NOTICEABLE (for debugging)
-			break;
-	}
-
-	// if top corner, make it darker!
-	if (position.y > 0) {
-		vs_color /= 2;
-	}
+	gl_Position = uni.proj_matrix * uni.mv_matrix * position;
 }
 )";
 	const char fshader_src[] = R"(#version 450 core
 
-in vec4 gs_color;
 out vec4 color;
 
 void main(void)
 {
-	color = gs_color;
+	color = vec4(0.5, 1.0, 0.0, 1.0);
 }
 )";
 	const char gshader_src[] = R"(#version 450 core
@@ -227,6 +110,48 @@ void main(void)
 )";
 	const char tcsshader_src[] = R"()";
 	const char tesshader_src[] = R"()";
+	const char cshader_src[] = R"(#version 450 core
+#define DEFAULT_DISTANCE 250.0
+#define PARTICLE_DISTANCE_FROM_VIEWER -10000.0f
+
+layout( local_size_x = 64*2 ) in; 
+
+uniform float Gravity1 = 1000.0; 
+uniform vec3 BlackHolePos1 = vec3(DEFAULT_DISTANCE, DEFAULT_DISTANCE, PARTICLE_DISTANCE_FROM_VIEWER); 
+uniform float Gravity2 = 1000.0; 
+uniform vec3 BlackHolePos2 = vec3(-DEFAULT_DISTANCE, -DEFAULT_DISTANCE, PARTICLE_DISTANCE_FROM_VIEWER); 
+ 
+uniform float ParticleInvMass = 1.0 / 0.1; 
+uniform float DeltaT = 0.05; 
+ 
+layout(std430, binding=0) buffer Pos { 
+  vec4 Position[]; 
+}; 
+layout(std430, binding=1) buffer Vel { 
+  vec4 Velocity[]; 
+}; 
+ 
+void main() { 
+  uint idx = gl_GlobalInvocationID.x; 
+ 
+  vec3 p = Position[idx].xyz; 
+  vec3 v = Velocity[idx].xyz; 
+ 
+  // Force from black hole #1 
+  vec3 d = BlackHolePos1 - p; 
+  vec3 force = (Gravity1 / length(d)) * normalize(d); 
+   
+  // Force from black hole #2 
+  d = BlackHolePos2 - p; 
+  force += (Gravity2 / length(d)) * normalize(d); 
+ 
+  // Apply simple Euler integrator 
+  vec3 a = force * ParticleInvMass; 
+  Position[idx] = vec4( 
+        p + v * DeltaT + 0.5 * a * DeltaT * DeltaT, 1.0); 
+  Velocity[idx] = vec4( v + a * DeltaT, 0.0); 
+}
+)";
 
 	GLuint compile_shaders_hardcoded(std::vector <std::tuple<std::string, GLenum>> shader_fnames) {
 		GLuint program;
@@ -256,6 +181,12 @@ void main(void)
 					throw "missing fshader source";
 				}
 				shader_src_ptr = gshader_src;
+				break;
+			case GL_COMPUTE_SHADER:
+				if (cshader_src[0] == '\0') {
+					throw "missing fshader source";
+				}
+				shader_src_ptr = cshader_src;
 				break;
 			default:
 				throw "missing a shader source";
